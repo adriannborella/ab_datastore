@@ -1,0 +1,1 @@
+ssh -o StrictHostKeyChecking=no -i /home/adrian/pomomdoro/ssh-key-2022-09-28.key ubuntu@129.151.117.160 "cd /home/ubuntu/project/ab_datastore && docker compose exec postgres bash /app/scrips/backup.sh"

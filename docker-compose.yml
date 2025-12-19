@@ -1,20 +1,32 @@
 
+
+networks:
+  postgres_compose:
+
+volumes:
+    postgres:
+    pgadmin:
+
+
 services:
   postgres:
-    container_name: ab_postgres
     image: postgres:16
     env_file:
       - ./variables.env
     volumes:
        - postgres:/data/postgres
-    ports:
-      - "5432:5432"
+       - ./backups:/app/backups
+       - ./scripts:/app/scripts
     networks:
-      - postgres
-    restart: unless-stopped
+      - postgres_compose
+    restart: always
+    deploy:
+      restart_policy:
+          condition: none
+      mode: replicated
+      replicas: 1
   pgadmin:
-    container_name: pgadmin_container
-    image: dpage/pgadmin4
+    image: dpage/pgadmin4:9
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
@@ -24,15 +36,20 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:
-      - "10000:80"
+      - "10010:80"
     networks:
-      - postgres
+      - postgres_compose
     restart: unless-stopped
-
-networks:
-  postgres:
-    driver: bridge
-
-volumes:
-    postgres:
-    pgadmin:
+    deploy:
+      mode: replicated
+      replicas: 1
+  postgresus:
+    container_name: postgresus
+    image: rostislavdugin/postgresus:latest
+    ports:
+      - "10011:4005"
+    volumes:
+      - ./postgresus-data:/postgresus-data
+    restart: unless-stopped
+    networks:
+      - postgres_compose
