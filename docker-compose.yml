@@ -15,8 +15,8 @@ services:
       - ./variables.env
     volumes:
        - postgres:/data/postgres
-       - ./backups:/app/backups
-       - ./scripts:/app/scripts
+       - ./backups:/app/backups:z
+       - ./scripts:/app/scripts:z
     networks:
       - postgres_compose
     restart: always
@@ -49,7 +49,7 @@ services:
     ports:
       - "10011:4005"
     volumes:
-      - ./postgresus-data:/postgresus-data
+      - ./postgresus-data:/postgresus-data:z
     restart: unless-stopped
     networks:
       - postgres_compose
